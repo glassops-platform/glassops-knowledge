@@ -1,0 +1,17 @@
+# Environment
+venv/
+.venv/
+.env
+.agent/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# GlassOps
+glassops_index/
+docs/generated/
