@@ -1,5 +1,7 @@
 # GlassOps Knowledge Package
 
+Imported from glassops-platform/glassops at e48af7314cbdae46ad3e97ab5e7ca7fb0923bfe1. The configured Google embedding and generation models need updating before this package can be used.
+
 This package manages the Retrieval-Augmented Generation (RAG) pipeline for GlassOps. It handles document discovery, embedding generation, vector indexing, and drift detection.
 
 ## Structure
@@ -47,3 +49,13 @@ To force a full re-index:
 ```bash
 npm run knowledge:pipeline -- --index
 ```
+
+## Running the tests
+
+From the repository root:
+
+```bash
+python -m pytest tests
+```
+
+Pass the `tests` folder. Running `pytest` with no path collects from the repository root and fails.
