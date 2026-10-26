@@ -49,3 +49,13 @@ To force a full re-index:
 ```bash
 npm run knowledge:pipeline -- --index
 ```
+
+## Running the tests
+
+From the repository root:
+
+```bash
+python -m pytest tests
+```
+
+Pass the `tests` folder. Running `pytest` with no path collects from the repository root and fails.
