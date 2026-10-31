@@ -1,0 +1,77 @@
+name: Rebuild the index
+
+# Run by hand. It confirms the configured model ids exist, rebuilds the index from the glassops
+# docs at one commit, checks the result by hash and runs one query as a smoke test. It calls the
+# Gemini API, so it spends quota. The manifest is uploaded as an artifact for a person to review and
+# commit. Nothing is pushed from this workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: glassops commit or branch to index
+        default: main
+  push:
+    branches: [knowledge/b005-fixes]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rebuild-index
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    env:
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Check out the docs to index
+        uses: actions/checkout@v7
+        with:
+          repository: glassops-platform/glassops
+          ref: ${{ inputs.ref || 'main' }}
+          path: corpus
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Confirm the configured models exist
+        run: |
+          python - <<'PY'
+          import json, sys
+          from google import genai
+          cfg = json.load(open("config/config.json", encoding="utf-8"))["models"]
+          want = {cfg["embedding"]["id"], cfg["generation"]["docs"], cfg["generation"]["query"]}
+          have = {m.name.removeprefix("models/") for m in genai.Client().models.list()}
+          missing = sorted(w for w in want if w not in have)
+          print("configured:", sorted(want))
+          if missing:
+              sys.exit("not available to this key: " + ", ".join(missing))
+          print("all configured models are available")
+          PY
+
+      - name: Dry run
+        run: python main.py --index --dry-run --root corpus
+
+      - name: Rebuild the index
+        run: python main.py --index --fresh --root corpus
+
+      - name: Check the index by hash
+        run: python main.py --check-index --root corpus
+
+      - name: Query smoke test
+        run: python main.py --query "What is the update policy for ADRs?"
+
+      - name: Upload the manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: index-manifest
+          path: index/manifest.json
