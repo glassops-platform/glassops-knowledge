@@ -16,3 +16,5 @@ glassops_index/
 docs/generated/
 # Private notes (this repo is public)
 .claude/
+corpus/
+corpus-latest/

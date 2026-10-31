@@ -1,6 +1,7 @@
-chromadb
-google-genai
-google-generativeai
+chromadb>=1.0
+google-genai>=1.0
+numpy
+pathspec
+pytest
 python-dotenv
 pyyaml
-pathspec
