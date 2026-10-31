@@ -15,7 +15,8 @@ from typing import Any, Dict, List, Optional
 
 import pathspec
 import yaml
-from knowledge.llm.client import LLMClient
+from knowledge.llm.client import GenerationError, LLMClient
+from knowledge.settings import PROMPTS_PATH, ConfigError
 
 from knowledge.adapters import (
     BaseAdapter,
@@ -73,7 +74,8 @@ class Generator:
         ".component": "visualforce",
     }
 
-    def __init__(self, root_dir: str, output_dir: Optional[str] = None):
+    def __init__(self, root_dir: str, output_dir: Optional[str] = None,
+                 llm: Optional[LLMClient] = None, prompts_path: Optional[Path] = None):
         """
         Initialize the generator.
 
@@ -81,14 +83,18 @@ class Generator:
             root_dir: Root directory of the repository.
             output_dir: Optional output directory for generated docs.
                         If None, docs are placed alongside source files.
+            llm: Optional client. Built from config on first use when omitted.
+            prompts_path: Optional prompts file. Defaults to this package's config/prompts.yml.
         """
         self.root_dir = Path(root_dir).resolve()
         self.output_dir = Path(output_dir).resolve() if output_dir else None
-        self.llm = LLMClient()
+        self._llm = llm
         self.cache_path = self.root_dir / "config" / "doc-cache.json"
 
-        # We assume generator is running with root_dir set correctly
-        self.prompts_path = self.root_dir / "config" / "prompts.yml"
+        # The prompts ship with this package, so they are found relative to the package, not
+        # relative to the repository being documented.
+        self.prompts_path = Path(prompts_path) if prompts_path else PROMPTS_PATH
+        self.failures: List[str] = []
         self.cache: Dict[str, dict] = {}
         self.prompts: Dict[str, Any] = {}
         self.gitignore_spec = self._load_gitignore()
@@ -108,6 +114,12 @@ class Generator:
             VisualforceAdapter(),
             XMLAdapter(),       # Catch-all for remaining .xml files
         ]
+
+    @property
+    def llm(self) -> LLMClient:
+        if self._llm is None:
+            self._llm = LLMClient()
+        return self._llm
 
     def _load_cache(self) -> None:
         """Load the documentation cache from disk."""
@@ -131,18 +143,18 @@ class Generator:
             print(f"[ERROR] Failed to save cache: {e}")
 
     def _load_prompts(self) -> None:
-        """Load prompts configuration from YAML file."""
+        """Load prompts configuration from YAML file. Raises ConfigError if it is missing or empty."""
         try:
-            if self.prompts_path.exists():
-                raw = yaml.safe_load(self.prompts_path.read_text(encoding="utf-8"))
-                self.prompts = raw.get("prompts", {})
-                print(f"[CONFIG] Loaded prompts from {self.prompts_path.name}")
-            else:
-                print(f"[WARNING] Prompts file not found: {self.prompts_path}")
-                self.prompts = {}
-        except Exception as e:
-            print(f"[ERROR] Failed to load prompts: {e}")
-            self.prompts = {}
+            raw = yaml.safe_load(self.prompts_path.read_text(encoding="utf-8"))
+        except FileNotFoundError as e:
+            raise ConfigError(f"prompts file not found: {self.prompts_path}") from e
+        except (OSError, yaml.YAMLError) as e:
+            raise ConfigError(f"could not read prompts file {self.prompts_path}: {e}") from e
+        prompts = raw.get("prompts") if isinstance(raw, dict) else None
+        if not isinstance(prompts, dict) or not prompts:
+            raise ConfigError(f'prompts file {self.prompts_path} has no "prompts" entries')
+        self.prompts = prompts
+        print(f"[CONFIG] Loaded {len(prompts)} prompts from {self.prompts_path}")
 
     def _get_prompt_for_file(self, file_path: Path, parsed_content: str) -> Optional[str]:
         """
@@ -406,7 +418,8 @@ hash: {content_hash}
             file_path: Path to the source file.
 
         Returns:
-            Generated documentation string, or None on failure.
+            Generated documentation string, or None when the file is skipped.
+            Raises GenerationError when any chunk fails, so no partial document is written.
         """
         adapter = self._find_adapter(file_path)
         if not adapter:
@@ -446,29 +459,27 @@ hash: {content_hash}
             if not prompt:
                 prompt = adapter.get_prompt(file_path, chunk)
             
-            result = self.llm.generate(prompt)
+            try:
+                result = self.llm.generate(prompt)
+            except GenerationError as e:
+                raise GenerationError(f"chunk {i + 1}/{len(chunks)} of {relative_path}: {e}") from e
 
-            if result:
-                # Clean up LLM output
-                result = self._clean_llm_output(result)
-                outputs.append(result)
-                if len(chunks) > 1:
-                    print(f"   [OK] Chunk {i + 1}/{len(chunks)}")
-            else:
-                print(f"   [FAILED] Chunk {i + 1}/{len(chunks)} failed")
-
-        if not outputs:
-            return None
+            outputs.append(self._clean_llm_output(result))
+            if len(chunks) > 1:
+                print(f"   [OK] Chunk {i + 1}/{len(chunks)}")
 
         # Post-process and combine
         return adapter.post_process(file_path, outputs)
 
-    def run(self, patterns: List[str]) -> None:
+    def run(self, patterns: List[str]) -> int:
         """
         Run the documentation generator.
 
         Args:
             patterns: List of glob patterns to process.
+
+        Returns:
+            The number of files that failed. The caller exits non-zero when it is above zero.
         """
         print(f"[INFO] Scanning from: {self.root_dir}")
         self._load_cache()
@@ -478,7 +489,7 @@ hash: {content_hash}
 
         if not files:
             print("[INFO] No files matched the patterns.")
-            return
+            return 0
 
         print(f"[INFO] Found {len(files)} file(s) to process\n")
 
@@ -491,7 +502,12 @@ hash: {content_hash}
                 relative_path = file_path.relative_to(self.root_dir).as_posix()
                 print(f"[INFO] Processing {idx}/{total_files}: {relative_path}")
                 
-                doc = self.generate_for_file(file_path)
+                try:
+                    doc = self.generate_for_file(file_path)
+                except GenerationError as e:
+                    print(f"   [FAILED] {e}")
+                    self.failures.append(relative_path)
+                    continue
 
                 if doc:
                     output_path = self._get_output_path(file_path)
@@ -528,4 +544,8 @@ hash: {content_hash}
         finally:
             self._save_cache()
 
-        print(f"\n[DONE] Generation complete: {success_count} generated, {skip_count} skipped")
+        print(f"\n[DONE] Generation complete: {success_count} generated, {skip_count} skipped, "
+              f"{len(self.failures)} failed")
+        for failed in self.failures:
+            print(f"   [FAILED] {failed}")
+        return len(self.failures)

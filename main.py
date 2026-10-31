@@ -1,140 +1,214 @@
 # main.py
 """
 GlassOps Knowledge Pipeline
-- Discover federated documentation
-- Compute embeddings (with router/fallback)
-- Build/update vector store
-- Detect semantic drift
+- Discover documentation under a docs root
+- Compute embeddings with the configured model
+- Build or update the vector store and write the index manifest
+- Check the manifest against the docs, with no model call
+- Detect duplicate content
 - RAG query
 - Documentation generation from source code
+
+Every failure exits non-zero.
 """
 
-import json
-import sys
-import os
-from pathlib import Path
-
-# Ensure 'packages' is in sys.path so we can import 'knowledge'
-# This allows running from root like: python packages/knowledge/main.py
-PACKAGE_ROOT = Path(__file__).parent.parent
-if str(PACKAGE_ROOT) not in sys.path:
-    sys.path.append(str(PACKAGE_ROOT))
-
-from knowledge.ingestion.federated_loader import discover_and_chunk_docs
-from knowledge.embeddings.router_embedding import get_embeddings_for_docs
-from knowledge.ingestion.index_builder import build_or_update_index
-from knowledge.drift.detect_drift import detect_drift
-from knowledge.rag.query_engine import query_index
-from knowledge.generation import Generator
-
-# Optional: load config
-from dotenv import load_dotenv
-# Load .env from project root (../../.env relative to this file)
-ROOT_DIR = Path(__file__).parent.parent.parent
-load_dotenv(ROOT_DIR / ".env")
-
-CONFIG_PATH = Path(__file__).parent / "config" / "config.json"
-with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-    config = json.load(f)
-
-
 import argparse
+import importlib.util
+import subprocess
+import sys
+from pathlib import Path
+from typing import List, Optional
 
-def run_generate(patterns: list[str]) -> None:
-    """Run documentation generation for the given patterns."""
-    print("[INFO] Starting documentation generation...")
-    generator = Generator(str(ROOT_DIR))
-    generator.run(patterns)
+PACKAGE_ROOT = Path(__file__).resolve().parent
 
 
-def run_pipeline():
-    parser = argparse.ArgumentParser(description="GlassOps Knowledge Pipeline")
-    parser.add_argument("--query", "-q", type=str, help="Run a RAG query against the knowledge base")
-    parser.add_argument("query_pos", nargs="*", help="Positional query string (joined by space)")
-    parser.add_argument("--index", "-i", action="store_true", help="Force re-indexing of documents")
-    parser.add_argument("--generate", "-g", action="store_true", help="Generate documentation from source code")
-    parser.add_argument("--pattern", "-p", type=str, action="append", dest="patterns",
-                        help="Glob pattern(s) for --generate (can be specified multiple times)")
-    args = parser.parse_args()
-
-    # Documentation generation mode
-    if args.generate:
-        patterns = args.patterns if args.patterns else [
-            "packages/**/*.go",
-            "packages/**/*.py",
-            "packages/**/*.ts",
-            "packages/**/*.js",
-            "packages/**/*.mjs",
-            "packages/**/*.tsx",
-            "packages/**/*.jsx",
-            "packages/**/*.yml",
-            "packages/**/*.yaml",
-            "packages/**/*.json",
-            "packages/**/*.tf",
-            "packages/**/*.cls",
-            "packages/**/*.trigger",
-            "packages/**/Dockerfile",
-            "!**/node_modules/**",
-            "!**/dist/**",
-            "!**/venv/**",
-            "!**/__pycache__/**",
-        ]
-        run_generate(patterns)
+def _ensure_package_importable() -> None:
+    """
+    The modules import each other as `knowledge.*`. In this repository the package is the
+    repository root, so register the root under that name when it is not importable already.
+    """
+    if importlib.util.find_spec("knowledge") is not None:
         return
-
-    # Consolidate query from flag OR positional args
-    final_query = args.query
-    if not final_query and args.query_pos:
-        final_query = " ".join(args.query_pos)
-
-    print("Starting GlassOps Knowledge Pipeline...")
-    
-    # If a query is provided and we are NOT forcing an index, jump straight to query
-    if final_query and not args.index:
-         # TODO: verify index exists? For now assume yes if the user is asking.
-         pass
-    else:
-        # Step 1: Discover federated docs
-        print("Discovering docs...")
-        docs = discover_and_chunk_docs()
-        print(f"Found {len(docs)} docs.")
-
-        # Step 2: Compute embeddings using router (Gemini primary, fallback Gemma)
-        print("Generating embeddings...")
-        embeddings = get_embeddings_for_docs(docs, batch_size=config.get("batch_size", 10))
-        print(f"Generated embeddings for {len(embeddings)} docs.")
-
-        # Step 3: Build or update vector store
-        print("Building/updating vector store...")
-        build_or_update_index(embeddings)
-        print("Vector store updated.")
-
-        # Step 4: Detect semantic drift
-        print("Checking for semantic drift...")
-        drifted_docs = detect_drift(embeddings, threshold=config.get("drift_threshold", 0.85))
-        if drifted_docs:
-            print("Semantic drift detected in these docs:")
-            for d in drifted_docs:
-                print(f"  - {d}")
-        else:
-            print("No semantic drift detected.")
-
-    # Step 5: RAG query (Example OR User provided)
-    if final_query:
-        print(f"Query: {final_query}")
-        response = query_index(final_query)
-        print(f"\nRAG Response:\n{response}\n")
-    elif args.index:
-        print("Re-indexing complete. Use --query '...' to ask questions.")
-    else:
-        # Default behavior: Run pipeline + Example Query
-        print("Running example RAG query...")
-        example_query = "List all ADRs related to workflow layer"
-        response = query_index(example_query)
-        print(f"RAG response: {response}")
-
-    print("GlassOps Knowledge Pipeline finished!")
+    spec = importlib.util.spec_from_file_location(
+        "knowledge", PACKAGE_ROOT / "__init__.py", submodule_search_locations=[str(PACKAGE_ROOT)]
+    )
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["knowledge"] = module
+    spec.loader.exec_module(module)
 
 
 if __name__ == "__main__":
-    run_pipeline()
+    _ensure_package_importable()
+
+from knowledge.settings import (  # noqa: E402
+    ConfigError,
+    embedding_settings,
+    load_config,
+    manifest_path,
+)
+
+DEFAULT_GENERATE_PATTERNS = [
+    "packages/**/*.go",
+    "packages/**/*.py",
+    "packages/**/*.ts",
+    "packages/**/*.js",
+    "packages/**/*.mjs",
+    "packages/**/*.tsx",
+    "packages/**/*.jsx",
+    "packages/**/*.yml",
+    "packages/**/*.yaml",
+    "packages/**/*.json",
+    "packages/**/*.tf",
+    "packages/**/*.cls",
+    "packages/**/*.trigger",
+    "packages/**/Dockerfile",
+    "!**/node_modules/**",
+    "!**/dist/**",
+    "!**/venv/**",
+    "!**/__pycache__/**",
+]
+
+
+def _load_env() -> None:
+    try:
+        from dotenv import load_dotenv
+    except ImportError:  # pragma: no cover
+        return
+    load_dotenv(PACKAGE_ROOT / ".env")
+    load_dotenv(Path.cwd() / ".env")
+
+
+def _git_head(root: Path) -> Optional[str]:
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(root), "rev-parse", "HEAD"],
+            capture_output=True, text=True, timeout=10, check=True,
+        )
+        return out.stdout.strip() or None
+    except Exception:
+        return None
+
+
+def run_generate(root: Path, patterns: List[str]) -> int:
+    """Run documentation generation. Returns the exit code."""
+    from knowledge.generation import Generator
+
+    print("[INFO] Starting documentation generation...")
+    failures = Generator(str(root)).run(patterns)
+    if failures:
+        print(f"[ERROR] {failures} file(s) failed to generate.")
+        return 1
+    return 0
+
+
+def run_index(root: Path, fresh: bool, cfg: dict, dry_run: bool = False) -> None:
+    """Embed the docs, write the vector store and the manifest. Raises on any failure."""
+    from knowledge.drift.detect_drift import detect_drift
+    from knowledge.embeddings.router_embedding import get_embeddings_for_docs
+    from knowledge.ingestion.federated_loader import discover_and_chunk_docs
+    from knowledge.ingestion.index_builder import build_or_update_index
+    from knowledge.ingestion.manifest import build_manifest, write_manifest
+
+    settings = embedding_settings(cfg)
+    print(f"[INFO] Discovering docs under {root}...")
+    docs = discover_and_chunk_docs(str(root), cfg.get("federated_doc_paths"))
+    batches = -(-len(docs) // settings.batch_size)
+    print(f"[INFO] {len(docs)} chunks, {batches} embedding requests to {settings.model} "
+          f"at {settings.dimensions} dimensions.")
+    if dry_run:
+        print("[INFO] Dry run: no embedding request sent, nothing written.")
+        return
+
+    embeddings = get_embeddings_for_docs(docs, batch_size=settings.batch_size)
+    build_or_update_index(embeddings, fresh=fresh, cfg=cfg, settings=settings)
+
+    manifest = build_manifest(docs, settings.model, settings.dimensions, _git_head(root))
+    path = manifest_path(cfg)
+    write_manifest(path, manifest)
+    print(f"[INFO] Wrote the index manifest to {path} (digest {manifest['digest'][:12]}).")
+
+    detect_drift(embeddings, threshold=cfg.get("drift_threshold", 0.85))
+
+
+def run_check_index(root: Path, cfg: dict) -> int:
+    """Compare the manifest with the docs and config. Makes no model call. Returns the exit code."""
+    from knowledge.ingestion.federated_loader import discover_and_chunk_docs
+    from knowledge.ingestion.manifest import check_manifest, read_manifest
+
+    settings = embedding_settings(cfg)
+    manifest = read_manifest(manifest_path(cfg))
+    docs = discover_and_chunk_docs(str(root), cfg.get("federated_doc_paths"))
+    problems = check_manifest(manifest, docs, settings.model, settings.dimensions)
+    if problems:
+        print("[ERROR] The index manifest does not match:")
+        for p in problems:
+            print(f"  {p}")
+        return 1
+    print(f"[OK] The index manifest matches {len(docs)} chunks (digest {manifest['digest'][:12]}).")
+    return 0
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="GlassOps Knowledge Pipeline")
+    parser.add_argument("--query", "-q", type=str, help="Run a RAG query against the knowledge base")
+    parser.add_argument("query_pos", nargs="*", help="Positional query string (joined by space)")
+    parser.add_argument("--index", "-i", action="store_true", help="Embed the docs and update the index")
+    parser.add_argument("--fresh", action="store_true", help="With --index, drop the index and build it from nothing")
+    parser.add_argument("--dry-run", action="store_true",
+                        help="With --index, count chunks and embedding requests without calling the API")
+    parser.add_argument("--check-index", action="store_true",
+                        help="Check the index manifest against the docs by hash. Makes no model call")
+    parser.add_argument("--root", type=str, default=".",
+                        help="Docs root to index, check or generate from (default: the current directory)")
+    parser.add_argument("--generate", "-g", action="store_true", help="Generate documentation from source code")
+    parser.add_argument("--pattern", "-p", type=str, action="append", dest="patterns",
+                        help="Glob pattern(s) for --generate (can be specified multiple times)")
+    return parser
+
+
+def run_pipeline(argv: Optional[List[str]] = None) -> int:
+    args = build_parser().parse_args(argv)
+    root = Path(args.root).resolve()
+
+    from knowledge.embeddings import EmbeddingError
+    from knowledge.ingestion import DocumentError, IndexBuildError, ManifestError
+    from knowledge.llm import GenerationError
+    from knowledge.rag import QueryError
+
+    try:
+        cfg = load_config()
+        if args.check_index:
+            return run_check_index(root, cfg)
+
+        _load_env()
+        if args.generate:
+            return run_generate(root, args.patterns or DEFAULT_GENERATE_PATTERNS)
+
+        final_query = args.query or (" ".join(args.query_pos) if args.query_pos else None)
+        print("Starting GlassOps Knowledge Pipeline...")
+
+        if args.index and args.dry_run:
+            run_index(root, args.fresh, cfg, dry_run=True)
+            return 0
+        if args.index or not final_query:
+            run_index(root, args.fresh, cfg)
+
+        if final_query or not args.index:
+            from knowledge.rag.query_engine import query_index
+
+            query = final_query or "List all ADRs related to workflow layer"
+            print(f"Query: {query}")
+            print(f"\nRAG Response:\n{query_index(query, cfg=cfg)}\n")
+        else:
+            print("Re-indexing complete. Use --query '...' to ask questions.")
+    except (ConfigError, DocumentError, EmbeddingError, IndexBuildError, ManifestError,
+            GenerationError, QueryError) as e:
+        print(f"[ERROR] {e}", file=sys.stderr)
+        return 1
+
+    print("GlassOps Knowledge Pipeline finished!")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(run_pipeline())

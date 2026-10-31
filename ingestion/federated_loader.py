@@ -1,137 +1,110 @@
-# federated_loader.py
-# Scans the repo for Markdown/docs, chunks them, hashes content
+# ingestion/federated_loader.py
+# Scans a docs root for Markdown, chunks it and hashes each chunk
 
-import hashlib
 import glob
-import json
-import os
+import hashlib
 import re
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List, Optional
+
+import yaml
+
+from knowledge.settings import load_config
+
+DEFAULT_DOC_PATHS = ["docs/", "packages/**/adr", "packages/**/docs"]
+IGNORED_DIRS = {"node_modules", "venv", ".venv", ".git", "__pycache__", "dist", "site-packages"}
+# Fields the loader sets. Frontmatter keys with these names must not overwrite them.
+SYSTEM_FIELDS = ("path", "source_file", "content", "hash")
+
+
+class DocumentError(Exception):
+    """A document matched the doc paths but could not be read."""
+
 
 def hash_content(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
-def discover_and_chunk_docs(root_dir: str = ".") -> List[Dict]:
+
+def _split_by_header(text: str, pattern: str) -> List[str]:
+    chunks = []
+    last_pos = 0
+    for match in re.finditer(pattern, text):
+        pos = match.start()
+        if pos > last_pos:
+            chunks.append(text[last_pos:pos].strip())
+        last_pos = pos
+    chunks.append(text[last_pos:].strip())
+    return [c for c in chunks if c]
+
+
+def chunk_markdown(content: str) -> List[str]:
+    """Split on level 2 headers, or level 1 headers when there are none."""
+    chunks = _split_by_header(content, r"(?m)^##\s+")
+    if len(chunks) <= 1:
+        chunks = _split_by_header(content, r"(?m)^#\s+")
+    return chunks
+
+
+def _find_doc_files(root: Path, base_paths: List[str]) -> List[Path]:
+    found = set()
+    for base in base_paths:
+        pattern = f"{base.rstrip('/')}/**/*.md"
+        for match in glob.glob(str(root / pattern), recursive=True):
+            path = Path(match).resolve()
+            if not path.is_file():
+                continue
+            if any(part in IGNORED_DIRS for part in path.relative_to(root).parts):
+                continue
+            found.add(path)
+    return sorted(found, key=lambda p: p.relative_to(root).as_posix())
+
+
+def discover_and_chunk_docs(root_dir: str = ".", doc_paths: Optional[List[str]] = None) -> List[Dict]:
     """
     Returns a list of dicts:
-    { "path": <file_path>, "content": <chunked_content>, "hash": <sha256> }
+    { "path": "<relative/file.md>#chunk-<n>", "source_file": "<relative/file.md>",
+      "content": <chunk text>, "hash": <sha256 of the chunk> }
+
+    Paths are relative to root_dir and use forward slashes, and line endings are normalised to LF,
+    so a Windows build and a Linux CI check produce the same ids and hashes.
     """
-    # Load patterns from config
-    config_path = Path(root_dir) / "packages" / "knowledge" / "config" / "config.json"
-    base_paths = []
+    root = Path(root_dir).resolve()
+    if doc_paths is None:
+        doc_paths = load_config().get("federated_doc_paths") or DEFAULT_DOC_PATHS
 
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            cfg = json.load(f)
-            base_paths = cfg.get("federated_doc_paths", [])
-            print(f"[CONFIG] Loaded {len(base_paths)} doc paths from config")
-    except Exception as e:
-        print(f"[WARNING] Failed to load config, using defaults: {e}")
+    docs: List[Dict] = []
+    files = _find_doc_files(root, doc_paths)
+    print(f"[INFO] Found {len(files)} documents under {root}.")
 
-    # Fallback to hardcoded patterns if config is empty
-    if not base_paths:
-        base_paths = ["docs/", "packages/**/adr", "packages/**/docs"]
-
-    # Build full patterns by applying file extensions to base paths
-    patterns = []
-    for base_path in base_paths:
-        # Add pattern for all .md files in the path
-        patterns.append(f"{base_path}/**/*.md")
-        # Also catch README.md files specifically
-        if not base_path.endswith("/**"):
-            patterns.append(f"{base_path}/**/README.md")
-    
-    doc_paths = []
-    for p in patterns:
-        # Use recursive globbing
-        full_pattern = os.path.join(root_dir, p)
-        # glob.glob in python < 3.10 might need recursive=True explicit arg for **
-        doc_paths.extend(glob.glob(full_pattern, recursive=True))
-
-    # Deduplicate paths
-    doc_paths = sorted(list(set(doc_paths)))
-    
-    docs = []
-    print(f"DEBUG: Found {len(doc_paths)} potential documents.")
-
-    for path in doc_paths:
-        # Robust ignore logic
-        ignored_dirs = ["node_modules", "venv", "vnev", ".git", "__pycache__", "dist", "site-packages"]
-        if any(ignored in path.split(os.sep) for ignored in ignored_dirs):
-            continue
-            
+    for path in files:
+        rel = path.relative_to(root).as_posix()
         try:
-            with open(path, "r", encoding="utf-8") as f:
-                content = f.read()
-            
-            if not content.strip():
-                continue
+            content = path.read_text(encoding="utf-8-sig")
+        except (OSError, UnicodeDecodeError) as e:
+            raise DocumentError(f"could not read {rel}: {e}") from e
+        content = content.replace("\r\n", "\n")
+        if not content.strip():
+            continue
 
-            if not content.strip():
-                continue
+        metadata: Dict = {}
+        match = re.search(r"\A---\n(.*?)\n---", content, re.DOTALL)
+        if match:
+            try:
+                parsed = yaml.safe_load(match.group(1))
+                if isinstance(parsed, dict):
+                    metadata = parsed
+                content = content[match.end():].strip()
+            except yaml.YAMLError as e:
+                print(f"[WARNING] Failed to parse frontmatter for {rel}: {e}")
 
-            # Parse Frontmatter
-            metadata = {}
-            match = re.search(r"^---\n(.*?)\n---", content, re.DOTALL)
-            if match:
-                import yaml
-                try:
-                    metadata = yaml.safe_load(match.group(1))
-                    # Remove frontmatter from content for chunking
-                    content = content[match.end():].strip()
-                except yaml.YAMLError as e:
-                    print(f"[WARNING] Failed to parse frontmatter for {path}: {e}")
+        for i, chunk_text in enumerate(chunk_markdown(content)):
+            record = {k: v for k, v in metadata.items() if k not in SYSTEM_FIELDS}
+            record.update({
+                "path": f"{rel}#chunk-{i}",
+                "source_file": rel,
+                "content": chunk_text,
+                "hash": hash_content(chunk_text),
+            })
+            docs.append(record)
 
-            # Smart Chunking Strategy:
-            # 1. Split by Level 2 headers (##) to keep context grouped
-            # 2. If no Level 2 headers, try Level 1 (#)
-            # 3. Fallback to whole file
-            
-            # Simple splitter logic
-            
-            # Helper to split text by regex pattern but keep the delimiter
-            def split_by_header(text, pattern):
-                chunks = []
-                last_pos = 0
-                for match in re.finditer(pattern, text):
-                    pos = match.start()
-                    if pos > last_pos:
-                        chunks.append(text[last_pos:pos].strip())
-                    last_pos = pos
-                chunks.append(text[last_pos:].strip())
-                return [c for c in chunks if c]
-
-            # Try splitting by ## first (Module/Section level)
-            chunks = split_by_header(content, r'(?m)^##\s+')
-            
-            # If we only have 1 chunk (no ##), try splitting by # (Page level, though rarely multiple # per file)
-            if len(chunks) <= 1:
-                chunks = split_by_header(content, r'(?m)^#\s+')
-            
-            # Final fallback: if file is huge but structureless, we might need arbitrary splitting?
-            # For now, let's stick to semantic headers.
-            
-            for i, chunk_text in enumerate(chunks):
-                if not chunk_text: continue
-                
-                # Create a unique ID/path for the chunk
-                # e.g. path/to/file.md#chunk-0
-                chunk_id = f"{path}#chunk-{i}"
-                
-                doc_record = {
-                    "path": chunk_id, # Store this so we know where it came from
-                    "source_file": path, # Keep original path metadata
-                    "content": chunk_text,
-                    "hash": hash_content(chunk_text)
-                }
-                
-                # Merge frontmatter metadata
-                doc_record.update(metadata)
-                
-                docs.append(doc_record)
-
-        except Exception as e:
-            print(f"Warning: Could not read {path}: {e}")
-            
     return docs
