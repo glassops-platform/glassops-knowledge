@@ -45,6 +45,11 @@ jobs:
 
       - name: Confirm the configured models exist
         run: |
+          if [ -z "$GOOGLE_API_KEY" ]; then
+            echo "::error::GOOGLE_API_KEY is empty in this run. Set the repository secret to a valid Gemini API key."
+            exit 1
+          fi
+          echo "GOOGLE_API_KEY is set, ${#GOOGLE_API_KEY} characters"
           python - <<'PY'
           import json, sys
           from google import genai
