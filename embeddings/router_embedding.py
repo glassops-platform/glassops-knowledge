@@ -1,25 +1,33 @@
-# router-embedding.py
-# Routes embedding requests based on quota / fallback
+# embeddings/router_embedding.py
+"""
+Embeds documents in batches with the configured model.
 
-from .gemini_embedding import GeminiEmbedding
-from .gemma_12b_it_embedding import Gemma12bItEmbedding
+There is one model and no fallback. The old primary and fallback modules called the same
+retired model, so the fallback was never a real one. A failure raises EmbeddingError and the
+run stops.
+"""
 
-class RPDLimitError(Exception):
-    pass
+from typing import Dict, List, Optional, Tuple
 
-def get_embeddings_for_docs(docs, batch_size=10):
-    primary = GeminiEmbedding()
-    fallback = Gemma12bItEmbedding()
-    embeddings = []
+from knowledge.settings import embedding_settings, load_config
+from .gemini_embedding import TASK_DOCUMENT, GeminiEmbedding
 
-    for i in range(0, len(docs), batch_size):
-        print(f"  Processed {i}/{len(docs)}...", end='\r')
-        batch = docs[i:i+batch_size]
-        try:
-            emb = primary.get_embeddings([d["content"] for d in batch])
-            embeddings.extend(zip(batch, emb))
-        except RPDLimitError:
-            emb = fallback.get_embeddings([d["content"] for d in batch])
-            embeddings.extend(zip(batch, emb))
+
+def get_embeddings_for_docs(
+    docs: List[Dict],
+    batch_size: Optional[int] = None,
+    embedder: Optional[GeminiEmbedding] = None,
+    task_type: str = TASK_DOCUMENT,
+) -> List[Tuple[Dict, List[float]]]:
+    if embedder is None:
+        embedder = GeminiEmbedding(embedding_settings(load_config()))
+    size = batch_size or embedder.settings.batch_size
+    embeddings: List[Tuple[Dict, List[float]]] = []
+
+    for i in range(0, len(docs), size):
+        print(f"  Processed {i}/{len(docs)}...", end="\r")
+        batch = docs[i:i + size]
+        vectors = embedder.get_embeddings([d["content"] for d in batch], task_type=task_type)
+        embeddings.extend(zip(batch, vectors))
     print(f"  Processed {len(docs)}/{len(docs)}... Done.")
     return embeddings

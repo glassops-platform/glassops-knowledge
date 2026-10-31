@@ -1,114 +1,93 @@
-# query_engine.py
-import chromadb
-import os
-from google import genai
-from google.genai import types
-import json
-from pathlib import Path
-from knowledge.embeddings.router_embedding import get_embeddings_for_docs
+# rag/query_engine.py
+"""
+Answers a question from the index: embed the query, retrieve chunks, generate an answer.
 
-def query_index(query, n_results=5):
-    """
-    query: string
-    returns: summarized answer from RAG
-    """
-    print(f"DEBUG: Querying for '{query}'...")
-    
-    # 1. Embed the query
-    # We strip it into a list wrapper because our embedding function expects list[str]
-    # unpacking the list of list result [ [0.1, ...] ] -> [0.1, ...]
+Model ids come from config. Every failure raises QueryError so the CLI exits non-zero.
+"""
+
+from typing import Dict, Optional
+
+from knowledge.settings import (
+    PACKAGE_ROOT,
+    collection_name,
+    embedding_settings,
+    generation_settings,
+    load_config,
+    persist_dir,
+)
+
+DEFAULT_SYSTEM_CONTEXT = "You are an expert for the GlassOps platform."
+
+
+class QueryError(Exception):
+    """The query could not be answered."""
+
+
+def _open_collection(cfg: Dict, client=None):
+    name = collection_name(cfg)
+    if client is None:
+        path = persist_dir(cfg)
+        if not path.exists():
+            raise QueryError(f"index not found at {path}. Build it with --index first.")
+        import chromadb
+        from chromadb.config import Settings
+
+        client = chromadb.PersistentClient(path=str(path), settings=Settings(anonymized_telemetry=False))
     try:
-        query_embeddings = get_embeddings_for_docs([{"content": query}])[0][1]
+        return client.get_collection(name=name)
     except Exception as e:
-        return f"Error generating embedding: {e}"
+        raise QueryError(f'collection "{name}" not found in the index. Build it with --index first.') from e
 
-    # 2. Query ChromaDB
-    # Read persist_dir from config
-    config_path = Path(__file__).parent.parent / "config" / "config.json"
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            cfg = json.load(f)
-            persist_dir_name = cfg.get("vector_store", {}).get("persist_dir", "glassops_index")
-    except Exception as e:
-        print(f"[WARNING] Failed to load config, using default: {e}")
-        persist_dir_name = "glassops_index"
 
-    persist_dir = os.path.join(os.getcwd(), persist_dir_name)
-    if not os.path.exists(persist_dir):
-        return "Error: Index not found. Please run with --index first."
+def _inject_triggers(cfg: Dict, query: str, chunks, sources) -> None:
+    for keyword, rel_path in cfg.get("retrieval_triggers", {}).items():
+        if keyword.lower() not in query.lower():
+            continue
+        abs_path = PACKAGE_ROOT / rel_path
+        if abs_path.exists() and str(abs_path) not in sources:
+            content = abs_path.read_text(encoding="utf-8")
+            chunks.insert(0, f"--- START SYSTEM REPORT ({rel_path}) ---\n{content}\n--- END SYSTEM REPORT ---\n")
+            sources.insert(0, str(abs_path))
+            print(f"[INFO] Trigger '{keyword}' detected. Injected {rel_path}.")
 
-    client = chromadb.PersistentClient(path=persist_dir)
-    collection = client.get_or_create_collection(name="glassops_knowledge")
-    
-    results = collection.query(
-        query_embeddings=[query_embeddings],
-        n_results=n_results
-    )
-    
-    # 3. Construct Context
-    context_chunks = results['documents'][0]
-    sources = results['ids'][0]
 
-    # Post-retrieval: Check for config-based file injection
-    try:
-        config_path = Path(__file__).parent.parent / "config" / "config.json"
-        with open(config_path, "r", encoding="utf-8") as f:
-            cfg = json.load(f)
-            triggers = cfg.get("retrieval_triggers", {})
-            
-            project_root = Path(__file__).parent.parent.parent.parent
-            injected_files = set()
-            
-            for keyword, rel_path in triggers.items():
-                if keyword.lower() in query.lower():
-                    # Resolve path relative to project root
-                    abs_path = project_root / rel_path
-                    if abs_path.exists() and str(abs_path) not in injected_files:
-                        try:
-                            content = abs_path.read_text(encoding="utf-8")
-                            # Prepend to context (high priority)
-                            context_chunks.insert(0, f"--- START SYSTEM REPORT ({rel_path}) ---\n{content}\n--- END SYSTEM REPORT ---\n")
-                            sources.insert(0, str(abs_path))
-                            injected_files.add(str(abs_path))
-                            print(f"DEBUG: Trigger '{keyword}' detected. Injected {rel_path}.")
-                        except Exception as e:
-                            print(f"Warning: Failed to inject trigger file {rel_path}: {e}")
+def query_index(query: str, n_results: int = 5, cfg: Optional[Dict] = None,
+                embedder=None, llm=None, chroma_client=None) -> str:
+    """Returns the answer text followed by its sources. Raises QueryError on failure."""
+    from knowledge.embeddings import TASK_QUERY, EmbeddingError, GeminiEmbedding
+    from knowledge.llm import GenerationError, LLMClient
 
-    except Exception as e:
-        print(f"Warning: Trigger mechanism failed: {e}")
+    cfg = cfg if cfg is not None else load_config()
+    emb_settings = embedding_settings(cfg)
+    gen_settings = generation_settings(cfg)
 
-    if not context_chunks:
-        return "I couldn't find any relevant information in the knowledge base."
-    
-    context_text = "\n\n---\n\n".join(context_chunks)
-    
-    # 4. Generate Answer with Gemini
-    api_key = os.getenv("GOOGLE_API_KEY")
-    if not api_key:
-        return f"Context found ({len(context_chunks)} chunks), but GOOGLE_API_KEY not set for generation.\n\nTop Source: {sources[0]}"
-
-    # Provide global context about the repository structure to the LLM
-    # Load from config or use default
-    config_path = Path(__file__).parent.parent / "config" / "config.json"
-    
-    # Default prompt if config fails
-    system_context = "You are an expert for the GlassOps platform."
-    
-    try:
-         with open(config_path, "r", encoding="utf-8") as f:
-             cfg = json.load(f)
-             if "system_context" in cfg:
-                 system_context = cfg["system_context"]
-    except Exception as e:
-         # Fallback
-         print(f"Warning: Could not load system_context from config: {e}")
+    collection = _open_collection(cfg, chroma_client)
+    meta = collection.metadata or {}
+    if meta.get("embedding_model") != emb_settings.model or meta.get("dimensions") != emb_settings.dimensions:
+        raise QueryError(
+            f"the index was built with {meta.get('embedding_model', 'an unrecorded model')}, "
+            f"config names {emb_settings.model} at {emb_settings.dimensions} dimensions. "
+            "Rebuild with --index --fresh."
+        )
 
     try:
-        client = genai.Client(api_key=api_key)
-        # Using user-specified model
-        model_name = 'gemma-3-12b-it'
-        
-        prompt = f"""{system_context}
+        embedder = embedder or GeminiEmbedding(emb_settings)
+        query_vector = embedder.get_embeddings([query], task_type=TASK_QUERY)[0]
+    except EmbeddingError as e:
+        raise QueryError(f"could not embed the query: {e}") from e
+
+    results = collection.query(query_embeddings=[query_vector], n_results=n_results)
+    chunks = list(results["documents"][0])
+    sources = list(results["ids"][0])
+    _inject_triggers(cfg, query, chunks, sources)
+
+    if not chunks:
+        raise QueryError("no relevant chunks found in the index")
+
+    system_context = cfg.get("system_context") or DEFAULT_SYSTEM_CONTEXT
+    context_text = "\n\n---\n\n".join(chunks)
+    # Gemma models on the Gemini API take no system instruction, so it goes in the prompt.
+    prompt = f"""{system_context}
 
 Answer the user's question based strictly on the provided context.
 If the answer is not in the context, say you don't know.
@@ -120,12 +99,10 @@ Question:
 {query}
 
 Answer:"""
-        
-        response = client.models.generate_content(
-            model=model_name,
-            contents=prompt
-        )
-        return f"{response.text}\n\nSources:\n- " + "\n- ".join(sources)
-        
-    except Exception as e:
-         return f"Error generating response: {e}\n\nContext:\n{context_text[:500]}..."
+
+    try:
+        llm = llm or LLMClient(model=gen_settings.query_model, settings=gen_settings)
+        answer = llm.generate(prompt)
+    except GenerationError as e:
+        raise QueryError(f"could not generate an answer: {e}") from e
+    return f"{answer}\n\nSources:\n- " + "\n- ".join(sources)

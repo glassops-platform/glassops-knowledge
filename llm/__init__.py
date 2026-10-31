@@ -1,6 +1,6 @@
 # llm/__init__.py
 """LLM client module for GlassOps Knowledge Pipeline."""
 
-from .client import LLMClient
+from .client import GenerationError, LLMClient
 
-__all__ = ["LLMClient"]
+__all__ = ["LLMClient", "GenerationError"]
