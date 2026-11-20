@@ -1,53 +1,84 @@
 # GlassOps Knowledge Package
 
-Imported from glassops-platform/glassops at e48af7314cbdae46ad3e97ab5e7ca7fb0923bfe1. The configured Google embedding and generation models need updating before this package can be used.
+Imported from glassops-platform/glassops at e48af7314cbdae46ad3e97ab5e7ca7fb0923bfe1.
 
-This package manages the Retrieval-Augmented Generation (RAG) pipeline for GlassOps. It handles document discovery, embedding generation, vector indexing, and drift detection.
+This package manages the Retrieval-Augmented Generation (RAG) pipeline for GlassOps. It handles document discovery, embedding generation, vector indexing, an index check by hash, and documentation generation.
 
 ## Structure
 
-- **ingestion/**: Fetches and chunks markdown files from the monorepo.
-- **embeddings/**: Generates vector embeddings using Google Gemini (via `google-generativeai`).
-- **drift/**: Detects semantic drift in documentation over time.
-- **rag/**: Provides a query engine for retrieving context-aware answers.
+- **ingestion/**: Finds and chunks Markdown files under a docs root, builds the Chroma index and writes the index manifest.
+- **embeddings/**: Generates vector embeddings through the Google Gen AI SDK (`google-genai`).
+- **llm/**: The generation client, with retries and rate limiting.
+- **generation/**: Generates documentation from source code with the prompts in `config/prompts.yml`.
+- **drift/**: Reports duplicate content across the indexed docs.
+- **rag/**: Answers questions from the index.
+
+## Models
+
+Every model id is set in `config/config.json` under `models`. No module hard-codes one.
+
+| Setting | Default | Notes |
+|---|---|---|
+| `models.embedding.id` | `gemini-embedding-001` | `gemini-embedding-2` also works |
+| `models.embedding.dimensions` | `768` | Required. `gemini-embedding-001` returns 3072 when no size is sent |
+| `models.generation.docs` | `gemma-4-31b-it` | Documentation generation |
+| `models.generation.query` | `gemma-4-26b-a4b-it` | RAG answers |
+
+Vectors from different models, or of different sizes, cannot share an index. After changing the embedding model or its dimensions, rebuild with `--index --fresh`.
+
+## Failures
+
+Every failure exits non-zero: a missing API key, an embedding or generation error, a vector of the wrong size, a failed index write and a missing prompts file. There is no fallback vector. A failed embedding stops the run.
 
 ## Usage
 
 ### 1. Setup
 
-Ensure you have a `.env` file in the project root with your API key:
+```bash
+python -m venv venv
+venv/bin/pip install -r requirements.txt    # Windows: venv\Scripts\pip
+```
+
+Put your API key in a `.env` file in this folder or in the folder you run from:
 
 ```env
 GOOGLE_API_KEY=your_key_here
 ```
 
-### 2. Run the Pipeline
+### 2. Build the index
 
-To scan docs, generate embeddings, and update the index:
+The index is built from a docs root, usually a checkout of the GlassOps repository. Paths under the root come from `federated_doc_paths` in the config.
 
 ```bash
-# Using npm script (easiest)
-npm run knowledge:pipeline
+# Count chunks and embedding requests first. This makes no API call.
+python main.py --index --dry-run --root ../glassops
+
+# Build from nothing
+python main.py --index --fresh --root ../glassops
 ```
 
-### 3. Query the Knowledge Base
+The Chroma index is written to `glassops_index/` (not committed). The build also writes `index/manifest.json`, which records the model, the vector size, the docs commit and the hash of every chunk. Commit the manifest.
 
-To avoid argument parsing issues with npm (especially on Windows), use the Python executable directly:
+Build from a clean checkout. Untracked files in the docs root end up in the manifest and the CI check then fails.
+
+### 3. Check the index
 
 ```bash
-# Direct Python command (Recommended)
-packages\knowledge\venv\Scripts\python.exe packages/knowledge/main.py --query "What is the update policy for ADRs?"
-
-# NPM alternative (may require extra escaping on Windows)
-npm run knowledge:pipeline -- --query "What is the update policy for ADRs?"
+python main.py --check-index --root ../glassops
 ```
 
-### 4. Force Re-indexing
+This compares the manifest with the docs by hash and makes no model call. It exits 1 when the docs, the model or the dimensions changed since the index was built. CI runs it against the commit recorded in the manifest, then reports whether the index is behind the latest docs.
 
-To force a full re-index:
+### 4. Query
 
 ```bash
-npm run knowledge:pipeline -- --index
+python main.py --query "What is the update policy for ADRs?"
+```
+
+### 5. Generate documentation
+
+```bash
+python main.py --generate --root ../glassops -p "packages/**/*.py"
 ```
 
 ## Running the tests
@@ -55,7 +86,7 @@ npm run knowledge:pipeline -- --index
 From the repository root:
 
 ```bash
-python -m pytest tests
+pytest
 ```
 
-Pass the `tests` folder. Running `pytest` with no path collects from the repository root and fails.
+The tests replace every Google client with a fake and make no network call.

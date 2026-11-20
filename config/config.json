@@ -1,11 +1,25 @@
 {
-  "embedding_models": {
-    "primary": "gemini-embedding-1.0",
-    "fallback": "gemma-3-12b-it"
+  "models": {
+    "embedding": {
+      "id": "gemini-embedding-001",
+      "dimensions": 768,
+      "batch_size": 10,
+      "rpm_limit": 90,
+      "tpm_limit": 25000
+    },
+    "generation": {
+      "docs": "gemma-4-31b-it",
+      "query": "gemma-4-26b-a4b-it",
+      "max_output_tokens": 8192,
+      "temperature": 0.2,
+      "rpm_limit": 24,
+      "tpm_limit": 12000
+    }
   },
   "vector_store": {
     "type": "chroma",
-    "persist_dir": "glassops_index"
+    "persist_dir": "glassops_index",
+    "collection": "glassops_knowledge"
   },
   "federated_doc_paths": [
     "docs/",
@@ -13,13 +27,15 @@
     "packages/**/docs"
   ],
   "retrieval_triggers": {
-      "audit": "packages/knowledge/docs/generated/drift_report.md",
-      "backup": "packages/knowledge/docs/generated/drift_report.md",
-      "legacy": "packages/knowledge/docs/generated/drift_report.md",
-      "overlap": "packages/knowledge/docs/generated/drift_report.md",
-      "drift": "packages/knowledge/docs/generated/drift_report.md"
+    "audit": "docs/generated/drift_report.md",
+    "backup": "docs/generated/drift_report.md",
+    "legacy": "docs/generated/drift_report.md",
+    "overlap": "docs/generated/drift_report.md",
+    "drift": "docs/generated/drift_report.md"
   },
-  "batch_size": 10,
   "drift_threshold": 0.85,
-  "system_context": "\nYou are an expert for the GlassOps platform.\nRepository Context:\n- `docs/`: Contains the current, authoritative documentation.\n- `docs_backup/`: Contains legacy or backup documentation. Content here may be outdated or duplicated.\n- `packages/knowledge/docs/generated/drift_report.md`: A system-generated report comparing `docs/` vs `docs_backup/` to identify duplicates.\n\nIf the user asks about \"overlap\", \"backup\", \"legacy\", or \"drift\", REFER to the information found in `drift_report.md` if it appears in the context.\nIf the drift report shows files are \"identical\", explain that to the user.\n"
+  "system_context": "\nYou are an expert for the GlassOps platform.\nRepository Context:\n- `docs/`: Contains the current, authoritative documentation.\n- `docs_backup/`: Contains legacy or backup documentation. Content here may be outdated or duplicated.\n- `docs/generated/drift_report.md`: A system-generated report comparing `docs/` vs `docs_backup/` to identify duplicates.\n\nIf the user asks about \"overlap\", \"backup\", \"legacy\", or \"drift\", REFER to the information found in `drift_report.md` if it appears in the context.\nIf the drift report shows files are \"identical\", explain that to the user.\n",
+  "index": {
+    "manifest": "index/manifest.json"
+  }
 }

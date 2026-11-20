@@ -1,0 +1,954 @@
+{
+  "version": 1,
+  "embedding_model": "gemini-embedding-001",
+  "dimensions": 768,
+  "chunk_count": 236,
+  "digest": "f0b48a4f77183de30b2caf6829ce3efc62e968da0d55a6340a083fd67a965706",
+  "chunks": [
+    {
+      "id": "docs/adr-index.md#chunk-0",
+      "hash": "978390da6c0af3aeb08cdfa7be56d82805437584f441f613d2e30d410caef371"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-1",
+      "hash": "68651937a96e0fc0652dc43238af6474136ecf1b50cb235bd42dce91f657f676"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-10",
+      "hash": "6422f2076c40e47acd515b259d6ff640a1b4221548607e1805b6432ea78b8810"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-11",
+      "hash": "24bf0d17a4df4c2e0ea9384e656b5956bfd03b440cef902bb097bbc1aae2efe5"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-12",
+      "hash": "87b45ce0c8e3852128e4ed8b07bd526fb96643ffbc3b8844f6f2029f9a8ed70a"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-13",
+      "hash": "7903bba741287a20be60af1e569fc7f077d58558a40401cc1e43db0d0df43883"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-2",
+      "hash": "82bed48b5e7bfa19c3929c0ca9ecc1316db0faee53fbf7161b3b0519f9ad2ed8"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-3",
+      "hash": "0d07b070b132d4dfedee7a42344be053d3617e82bf6af93c67436cd9763e2d4b"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-4",
+      "hash": "703fbfb6bdbeb64c6a55bbabab12aab7e30e62b80d720466fce66ae57d999a6a"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-5",
+      "hash": "be5b33f7575d89f326bb0e10eef32633f11a7d29707c9a8eacfefde796f1deb3"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-6",
+      "hash": "2ffc093d31a518476e33335417d7c68663817dcdbdc56aa3bacd804ea27a1fc6"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-7",
+      "hash": "48691ff6d52d54c084a7e032c653fcbee40175559264fe401b59988bc9ffed44"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-8",
+      "hash": "4e458590dbf70b14644da7e501537e99927fa93701bd63c061438c7b0648f107"
+    },
+    {
+      "id": "docs/adr-index.md#chunk-9",
+      "hash": "d404e7c7fa3d6d77fab2d01ce3f63037ace81f12db61665c40a20ec0bd50b351"
+    },
+    {
+      "id": "docs/adr/001-system-api-primitive.md#chunk-0",
+      "hash": "39a4c9262e76793a9ad7fbebf596b4fb79ee45ac74ead292a9b6a05450c8484f"
+    },
+    {
+      "id": "docs/adr/001-system-api-primitive.md#chunk-1",
+      "hash": "cbe6e690400e1028efaee85795540ad1cae6decd30346eabdf76d2479f3d5d08"
+    },
+    {
+      "id": "docs/adr/001-system-api-primitive.md#chunk-2",
+      "hash": "da01ebb5a7d27ad315171b295f563b7d7a007949de7274f45f9d7b4092233ac8"
+    },
+    {
+      "id": "docs/adr/001-system-api-primitive.md#chunk-3",
+      "hash": "f070312a1788033567af66f1126a8dde5d2bb67d1f49944a6bd7576690552865"
+    },
+    {
+      "id": "docs/adr/001-system-api-primitive.md#chunk-4",
+      "hash": "c30f812f03476c4a19b53c69b93c317cec90175779b0e30ee31269e0d0954afb"
+    },
+    {
+      "id": "docs/adr/001-system-api-primitive.md#chunk-5",
+      "hash": "40e29b990c4b27c9821c629794cc0c7a8916c69840ce515df4b2937f014b8fdb"
+    },
+    {
+      "id": "docs/adr/001-system-api-primitive.md#chunk-6",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/002-github-execution-authority.md#chunk-0",
+      "hash": "bfae6b56f5e211dc2e79f16fefc180a75275a2a84892d78204d4f376b7ae3c3a"
+    },
+    {
+      "id": "docs/adr/002-github-execution-authority.md#chunk-1",
+      "hash": "cbc47165f008572f6fdceed52dbb0b9ed68630d7f55a145220358527660b7c89"
+    },
+    {
+      "id": "docs/adr/002-github-execution-authority.md#chunk-2",
+      "hash": "f1d8b1ee4b981b01c34b354aeebc2b483b15d17b5d4689fc7f1b2f16879477a2"
+    },
+    {
+      "id": "docs/adr/002-github-execution-authority.md#chunk-3",
+      "hash": "9e6ac111b7ff83ad0938ed1f00e41f4e6dfa03e80fec7e60096658d6483d5fc4"
+    },
+    {
+      "id": "docs/adr/002-github-execution-authority.md#chunk-4",
+      "hash": "6f134b3d38fb3f60094413422ae33bbe65d112e1f8244532461452caa3358d40"
+    },
+    {
+      "id": "docs/adr/002-github-execution-authority.md#chunk-5",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/003-additive-governance.md#chunk-0",
+      "hash": "5c6f844ba908c62c5e8fa39b20d6d64b71084be99208afae6ddb5008c92ccc8f"
+    },
+    {
+      "id": "docs/adr/003-additive-governance.md#chunk-1",
+      "hash": "d8f5f6622259d3f3454d37c23938c20aae57417a80bfd6d2c33fa10823c8bca9"
+    },
+    {
+      "id": "docs/adr/003-additive-governance.md#chunk-2",
+      "hash": "d4ac4c189e1f36c70b12677b98b0f9c16218a378a92455a210ba1da55823788f"
+    },
+    {
+      "id": "docs/adr/003-additive-governance.md#chunk-3",
+      "hash": "f74a50eb0ce9d54c07357788fd9ec32e6583fe058a4aba5efc2e4fc7f767882f"
+    },
+    {
+      "id": "docs/adr/003-additive-governance.md#chunk-4",
+      "hash": "87eeecca9d84a1e768130e83e0d952fc4c9e75cfffbaa9c5b86437f21b9b9ad9"
+    },
+    {
+      "id": "docs/adr/003-additive-governance.md#chunk-5",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/004-schema-contract-config.md#chunk-0",
+      "hash": "07fbf8ca13479018a4c16626614b673dbb7b5e87e9c5b00ff440ce89377900ba"
+    },
+    {
+      "id": "docs/adr/004-schema-contract-config.md#chunk-1",
+      "hash": "0d22a2afc9f963edd0a27b536dde8f643967767a3f0c5b6e7f1befc4eacd63a0"
+    },
+    {
+      "id": "docs/adr/004-schema-contract-config.md#chunk-2",
+      "hash": "ab9f58a2fcf1e0086f7ce4f1efbff932952d32106c460d37bbc11c0b55e1d59d"
+    },
+    {
+      "id": "docs/adr/004-schema-contract-config.md#chunk-3",
+      "hash": "fed9101ef5c525faa44e2b9a8753d564a32248f7f16b803d269f40ecb5890f7a"
+    },
+    {
+      "id": "docs/adr/004-schema-contract-config.md#chunk-4",
+      "hash": "bbf7cb076c3bc627c47280548fee5fb69c6f3236a676d734f133caa6e309e6ee"
+    },
+    {
+      "id": "docs/adr/004-schema-contract-config.md#chunk-5",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/005-control-plane-architecture.md#chunk-0",
+      "hash": "794f53d3207612063b0961223e4ab0b2e69e7f823954b2349abe3196b295e8ba"
+    },
+    {
+      "id": "docs/adr/005-control-plane-architecture.md#chunk-1",
+      "hash": "30e9ac50987c4e1f046191a328ee4942600165fe27cfbcaeeba7936fbe5ca8ee"
+    },
+    {
+      "id": "docs/adr/005-control-plane-architecture.md#chunk-2",
+      "hash": "bd61953b55231076525e3ccf258df58053560e2a075f21637f529ee21bfc96e8"
+    },
+    {
+      "id": "docs/adr/005-control-plane-architecture.md#chunk-3",
+      "hash": "d9e2ac281bf37ecbd9ec26535dc3a6be1676cd67f66296efee2e4b0a4281d99d"
+    },
+    {
+      "id": "docs/adr/005-control-plane-architecture.md#chunk-4",
+      "hash": "963a7920461e4187e99d98ac063ad4bce9d36d4937c1d8fc3640aa1c9c48b5f1"
+    },
+    {
+      "id": "docs/adr/005-control-plane-architecture.md#chunk-5",
+      "hash": "127c5b0e500fc0a189e36582dc58bc1e0ce32d00c2faf28fe734a1cedd64b217"
+    },
+    {
+      "id": "docs/adr/005-control-plane-architecture.md#chunk-6",
+      "hash": "834bc076afe9678e35fbf8ba64624c65fdfe53c6aa21c2fc2d3b2ea01dc3f2f4"
+    },
+    {
+      "id": "docs/adr/005-control-plane-architecture.md#chunk-7",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-0",
+      "hash": "914149aba469649e05321b46e38d859e7760a1f6747cbaeff8cb45ccdf83971f"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-1",
+      "hash": "9bbde411a5b300a8c283da5e695b8e3098e79364bfc23d39a85963cfcce8e0ac"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-10",
+      "hash": "ed1d84046d48125f248546c7c4286b542777978c037b1240af21fe9cea600a5c"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-11",
+      "hash": "3d48b2b294ad50feb84384547e0bf605fa5f0032c62e3566f6d1a5abaee03e3b"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-12",
+      "hash": "3945a377de8acc514c8e331075e3e31e6313bbbbf693f80e6c399ab2623145aa"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-13",
+      "hash": "89c7a6a204e103e2d36be8b6ed58efd12cf653f4699a2c1274e5130951c00c02"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-14",
+      "hash": "1b6116ab8a94fd91ae78c7e5216ea294d59904efa3274ae4644f9b4bee02ed56"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-15",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-2",
+      "hash": "418ffd7ba76b0bd2cb652dce139d6e9e1a416d54d1ce9935008aff85afee7255"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-3",
+      "hash": "7562c9ec76b336d212bf05d4511c9b88beba5f310ce8fb199d5297f0c04115ad"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-4",
+      "hash": "e7d9670df33c59c86b17b79172ca18bd635bd747a9f7bd0ac4f1a0f0816b2fa1"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-5",
+      "hash": "4cbb77f25d951ba667280e6ca40f313404c394441d09abd2e9fbdde13cf70212"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-6",
+      "hash": "7cd90e4f02511ae1abe5803e4cb5d47be5734fb3e4de90f2cd403891b6d62443"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-7",
+      "hash": "9ea98e505a3c54b5636785b3e4f7d74677411a2ea129ec1aa32aa9585147f2ee"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-8",
+      "hash": "c9888b1413806313a853dc7a7fb12626ce16b6cd2bcc76047ac3e28139c149c8"
+    },
+    {
+      "id": "docs/adr/006-documentation-as-governed-artifact.md#chunk-9",
+      "hash": "197162a4fb646036c0d4cb3cd91b3e8829aab5c4f6e3f68fa12fd5dca6d2b393"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-0",
+      "hash": "83ba02898b4081e86ee6d913e2ec2d8840fb679b10926e320a3a8f7646f81d0f"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-1",
+      "hash": "194d0518123d93c82ce7ff77b1eacdd0779723278560c22aa4a64114563d521a"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-10",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-2",
+      "hash": "617f5b6a2ce10e8305a2062ce2cbe0553f8fc0d99fd8f561d21c59e6bec030f4"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-3",
+      "hash": "d04868ce591f5af37eafd33103fe5faaa54da55b96593df88de382da7b598a57"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-4",
+      "hash": "b7e24b5e260328e327c29f01f91ad2da19ec80d8f4e5f797567587fa1fcbec7c"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-5",
+      "hash": "9a69a49542a296c2ace120bc5e920891039784788d083414c1b761acdc9e03bc"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-6",
+      "hash": "2e93173fa650597f8e2f818b2072f597ff3783610243fff243d70c7e3ef8adb5"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-7",
+      "hash": "37362e44d0f322f24e1572d1d3d546328221cd298e222e5c32917a779329a591"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-8",
+      "hash": "59356cd0eec8476b3a4071784ba552b46fe49333f996eac93400964e2b8bf964"
+    },
+    {
+      "id": "docs/adr/007-protocol-supremacy-enforcement.md#chunk-9",
+      "hash": "9ff69392494f9fe8ce42d7cbe76af1cee5d81f18b59c48d67a95ca6d629a929d"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-0",
+      "hash": "fd6e55b9b137019049c7fe29b7cb07787b52357e3d94d034fed38484294b8492"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-1",
+      "hash": "4a02cb02c290b813c21f56a2cf15a65dbeb4c1f13869f21ae4de3e7d11473f0d"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-10",
+      "hash": "8501ab1bf6bd3401bd572059752d5294f3ad86c60a5db2d55f32e18bf6df351b"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-11",
+      "hash": "3d820b70644f4a475f19c7a42b70a8a75a32dabab80bca36c55180f6e7441a9a"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-12",
+      "hash": "0da22e5c601078337b55e3afa9962110b975cfca6f5bd141be3178d6c8ba8674"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-13",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-2",
+      "hash": "3a3adaaf3cdc47338d52b4da5bc37a8ef2d567c37a991716a42c4ac753380585"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-3",
+      "hash": "cebdd5a5c074c7530480375da6c79524771af78e291ce5f326e0b255cd67ad90"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-4",
+      "hash": "ea1b9364e9f4303235e2f2fe6498fcfe46077cc74e7f9e197fb8d162c8dee4b3"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-5",
+      "hash": "b6a3f13597c6f24d215535bc7015aadd16a013c5a49dda8b011f57c37fe8c35d"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-6",
+      "hash": "981f58dd813380eabc72ccd793d0f94dd7b40eb5c242f4d20caaa4086160a971"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-7",
+      "hash": "cfad5e83ed33b7fe2c6d7eae1fa5d9772b2d98a5516d323bb069c0013fd8f5d7"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-8",
+      "hash": "4f16d2a362308ac0d8938973bf1748871e639e123efdcd3fd3e65146a3de42f8"
+    },
+    {
+      "id": "docs/adr/008-federated-documentation-structure.md#chunk-9",
+      "hash": "bb3593a93448e207ff5444d616324d75d79637d59abf055410a1502ae4b2ba19"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-0",
+      "hash": "94f321eddaafc18a01a2cfe37c998b2c7e4bdbe3e37b1e83eea6ab95e8531fd5"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-1",
+      "hash": "eae4d34010e0a6295a5282ac58f3fc49e60c03d7f2bf00440a9f7e532cf814ae"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-10",
+      "hash": "e47e630feda48653b48970bb6b60f66221d1b6c49c78118a7fb808eecbd29f24"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-11",
+      "hash": "57291347174b8af092dec1358c70c354c0e80152006ee82a965d981cdb12d3fe"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-12",
+      "hash": "cd4f114b382ac695a8fd23ab0ee83200ff73749f5af88b9ec834589cbadc45e0"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-13",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-2",
+      "hash": "e26ccf765dbc134f5297217105f961a0a0b32876acf6ff2ad978ca7d8c55c4d0"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-3",
+      "hash": "d16493997f5889da5645f4ebd3f94c4415746d6c602b32b5182f6ba5a1e278a8"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-4",
+      "hash": "a4dc4ec9922dda5a82d6f2d002eb3aa0841ce46c762a99b5b51093cc90b0269a"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-5",
+      "hash": "a6e930218f96e1af54cde0b50cfd5a6c090f01aff621c022fe048b293bf2c924"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-6",
+      "hash": "a44b66ea85ad2e5762076350ddb8db4eac03927b435f5e038ff12f750eb38145"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-7",
+      "hash": "eb95852250c04fa561551e4aad4ee5d5ed72327b764a493283f6ac31a994c180"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-8",
+      "hash": "6e965c3e7eada77b77ef0a332f67d552b299027777b9946740364038c0ea4db1"
+    },
+    {
+      "id": "docs/adr/009-8-10-vs-10-10-bridge-strategy.md#chunk-9",
+      "hash": "d94601266853c597213c2ee60de1809cf6fbe36a559e88a002404a505e6cc047"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-0",
+      "hash": "8993d6847f08b21d87cd680304a0cdedf5a21d0463f631e01658a3fbde7bd615"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-1",
+      "hash": "fbbeb9bd32a6e26746bae96595e060df9d397eeea20e17d292f180148d2b6d29"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-10",
+      "hash": "73db474f4fdfef681730b6f80ec3c6afb20211bf2e24f803c16b31f6bb7940e3"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-11",
+      "hash": "d5d3286ec9b7cd248f77deebaa2393ea1aeec5b7292fee7a616b9205d1543074"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-12",
+      "hash": "17ba5f0eba4193283a563e9634a64b9834501e8a56e2290997e327b751538097"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-13",
+      "hash": "b8ca8127cfbee687b2ce1ade0cbb72ae66f5d675cc7fbb2585c7ce6f738c1407"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-14",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-2",
+      "hash": "73f1520a22155010d5233b9c8c9a207af4f9bd6533bd9c9eea5864bff7baee66"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-3",
+      "hash": "18aea020ad3cc15481a971be4a9cbaf7f6a22db269bd822b8ba14f0f0ab42ddd"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-4",
+      "hash": "34696366042036183d23ed1277b975115c867fee66488c91c22106ae2a54ea93"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-5",
+      "hash": "62c80b6bd2c83de792f7a5da3478d99235b1b549e8a1bd964ad89b84b1628f50"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-6",
+      "hash": "624792fa1dcaeb7efacfbc174dfa4a0a07c126622da4d94473cf785ffda12122"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-7",
+      "hash": "7421e3d46e3ff337a8e03a957ed047fdf5bb55a2ae3a84bcf9a693c2b85d1629"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-8",
+      "hash": "87ce7d806ade32e6fb4d1ac8fb78e06320caeace7fe720ab13afb552bc9907db"
+    },
+    {
+      "id": "docs/adr/010-identity-contract.md#chunk-9",
+      "hash": "25ec016d4a318853d13e53d8bbb84c485175463fadd204ec5acc00d09c21ac6d"
+    },
+    {
+      "id": "docs/adr/011-monorepo-strategy.md#chunk-0",
+      "hash": "ed49e02fa1e8cc15dc97237132689bf3261a15c9295f1d2b8baaba85759e4350"
+    },
+    {
+      "id": "docs/adr/011-monorepo-strategy.md#chunk-1",
+      "hash": "e0dc9e48f4388422b988b23a0aff0726c775ab0210aaf2af8663dd02618d4a54"
+    },
+    {
+      "id": "docs/adr/011-monorepo-strategy.md#chunk-2",
+      "hash": "8d63d7cc87f307566276e4e4718709c5bfb604f512715881cb5416824d8aca13"
+    },
+    {
+      "id": "docs/adr/011-monorepo-strategy.md#chunk-3",
+      "hash": "ba693368edb57ff68bef2068ec37d6fc7a7186955da6f9305c3a02d0b0c74437"
+    },
+    {
+      "id": "docs/adr/011-monorepo-strategy.md#chunk-4",
+      "hash": "b4e6dcf721db6068817ebfa7222d0307b014230683e9f5931ec16b41196ce8b3"
+    },
+    {
+      "id": "docs/adr/011-monorepo-strategy.md#chunk-5",
+      "hash": "d8d0d7a6b27bda058f1a0a857a49a3e8a3faeb7774d749447d3d4b842bd63a02"
+    },
+    {
+      "id": "docs/adr/README.md#chunk-0",
+      "hash": "47f4fe9d469298460ffd641bc490d5d02fcbea129b96874d5583994653bae764"
+    },
+    {
+      "id": "docs/architecture/overview.md#chunk-0",
+      "hash": "09699e9f3419d667d39ed7f45c7544f62392b9782dc87fc19e2ece92cab0ebcc"
+    },
+    {
+      "id": "docs/architecture/overview.md#chunk-1",
+      "hash": "dd8601960ec4059d49ff20784739d9504941b7cb11dcfac9c74e3e065ab36935"
+    },
+    {
+      "id": "docs/architecture/overview.md#chunk-2",
+      "hash": "05ac54459b93f4b16280cf5102dea4099f5b26d006268f9ff41a84a749543ced"
+    },
+    {
+      "id": "docs/architecture/overview.md#chunk-3",
+      "hash": "ea8c392f983baa670b953ffaaba3081177ab21ad738e0a765b178660ecb543fa"
+    },
+    {
+      "id": "docs/architecture/overview.md#chunk-4",
+      "hash": "c30916ea65d7442b198b981ca97615d7c501ede2234a445026ac79e60f48599f"
+    },
+    {
+      "id": "docs/architecture/overview.md#chunk-5",
+      "hash": "c9967e82781eae47cf50c70140b3e6c6363ad99104dd5ac783a2b63a19940154"
+    },
+    {
+      "id": "docs/doc-map.md#chunk-0",
+      "hash": "c3328f8659d22e78990727542246d261f438a368843d0b3ce9898816977f59cf"
+    },
+    {
+      "id": "docs/doc-map.md#chunk-1",
+      "hash": "a3b4442ac9024794f5e2610dd30a48e0335b9e9deeb47444c6a8cb7a61a7f6db"
+    },
+    {
+      "id": "docs/doc-map.md#chunk-2",
+      "hash": "b6c4f63c9099879205e225932deb5f490284edbcf25dde61038a75b29fa6ac88"
+    },
+    {
+      "id": "docs/doc-map.md#chunk-3",
+      "hash": "1781c8be8d03fd32782cc8ba3e3f1c0e32b293e97e5b197114751031338b044c"
+    },
+    {
+      "id": "docs/guides/deploy-with-github.md#chunk-0",
+      "hash": "d079e7cc9ded338d189f99e2cd040e6825816cc74f631a284a8ab117b4b63e4e"
+    },
+    {
+      "id": "docs/guides/deploy-with-github.md#chunk-1",
+      "hash": "325099f2ad7799186baaa5d88a4212d9014a7d0100d9d28ff59030db9c5d5b76"
+    },
+    {
+      "id": "docs/guides/deploy-with-github.md#chunk-2",
+      "hash": "931235d244928ec84f699419bf61fd4ba474c5db828a9fea3a26013a409a242c"
+    },
+    {
+      "id": "docs/guides/deploy-with-github.md#chunk-3",
+      "hash": "6435ed9fbbfbd7affe6c6668875398c9f253a3af93751260c92dccf314097d68"
+    },
+    {
+      "id": "docs/guides/deploy-with-github.md#chunk-4",
+      "hash": "5557665e1536999fbf315a7319dfbf3fea3fd1c324282c44b96dd38db3ed5b59"
+    },
+    {
+      "id": "docs/guides/other-ci.md#chunk-0",
+      "hash": "587f676a8f4575f3471cb935ed03074dc555fc69805c22c6fc6aa8003d2adb97"
+    },
+    {
+      "id": "docs/guides/other-ci.md#chunk-1",
+      "hash": "8469eac0ff8eb46519435a89fc650dc639e4e3b31254f5cf68badb23ffe3f162"
+    },
+    {
+      "id": "docs/guides/other-ci.md#chunk-2",
+      "hash": "5ac0539bdfd57e324e9a8d433a0734e91284686fda37adebaaead4a230f48aff"
+    },
+    {
+      "id": "docs/guides/other-ci.md#chunk-3",
+      "hash": "899b05560e8f117e4199a40935045af9cf9b3375d8f46ed39cb5c78b456ff3a4"
+    },
+    {
+      "id": "docs/guides/other-ci.md#chunk-4",
+      "hash": "77e296805b45885941ca757ba74202199b4534f146f5ce238dcaadbf593ebce4"
+    },
+    {
+      "id": "docs/guides/other-ci.md#chunk-5",
+      "hash": "e3615ee9070f3c5ee713bd096328248f3c608b15dd8057786ccb6d2b3da32e0a"
+    },
+    {
+      "id": "docs/guides/other-ci.md#chunk-6",
+      "hash": "5d7a797976b5a44eebbaee450e99631679d35f21cdf73734e9065c174fe4129d"
+    },
+    {
+      "id": "docs/guides/other-ci.md#chunk-7",
+      "hash": "3df2fe6d55c1596c90c3ab8ee9d20c7c9521404e2ce2b42a025782ab24c6fe83"
+    },
+    {
+      "id": "docs/guides/run-a-pipeline.md#chunk-0",
+      "hash": "7ea907df6d307cdb692fb8aa185b68e9aa62be656052f0cedb14d75ecc386692"
+    },
+    {
+      "id": "docs/guides/run-a-pipeline.md#chunk-1",
+      "hash": "6fccda082c72dc6ad77eb4c06cb70da7e96f603016ab7b42636ef590d14e758f"
+    },
+    {
+      "id": "docs/guides/run-a-pipeline.md#chunk-2",
+      "hash": "8be4d9eb13f6a9afaf5d53a9062bd80f7139136c9efa2a5c9b7bd04b7fb8e57b"
+    },
+    {
+      "id": "docs/guides/run-a-pipeline.md#chunk-3",
+      "hash": "b31bf66b7d80b4d0ef15eaae74e4c6bf6b748090e9b30f5a869cc0d683c83980"
+    },
+    {
+      "id": "docs/guides/run-a-pipeline.md#chunk-4",
+      "hash": "58c6452280ca77dc25095a39148a71c387bb672fa37852eb7c18b047d3afcf77"
+    },
+    {
+      "id": "docs/guides/scratch-org-settings.md#chunk-0",
+      "hash": "faffeed19465c3f629f9968f91bbbf176f910834bea9f0b12ac3936b23eba4b9"
+    },
+    {
+      "id": "docs/guides/scratch-org-settings.md#chunk-1",
+      "hash": "4ae5162f74a95a30fc993fb9e66f8b0528fd511e918295b9487f6daa35ff2076"
+    },
+    {
+      "id": "docs/guides/scratch-org-settings.md#chunk-2",
+      "hash": "9f724c8646f1eea80aa32aaac5d5e4c99ba97fc74658f4f3dc3b4db6626bce6b"
+    },
+    {
+      "id": "docs/guides/scratch-org-settings.md#chunk-3",
+      "hash": "fd16a50863e94834369684b00d7f59117723d164a9219df7916c751b02dc68de"
+    },
+    {
+      "id": "docs/guides/scratch-org-settings.md#chunk-4",
+      "hash": "573dad461e0324ea591527bfab1951b3f6deed6e1b97b8bb96a01f275241f4fc"
+    },
+    {
+      "id": "docs/guides/scratch-org-settings.md#chunk-5",
+      "hash": "23cd4adac8bad4f2eac98c4b77b4e91f47f2c12b38e65eff0d02ebfef77a7a66"
+    },
+    {
+      "id": "docs/guides/scratch-org-settings.md#chunk-6",
+      "hash": "23d54c7cfef914796f3756f499af034cdc9b29823980d5f5ea9a508fc51d2a9d"
+    },
+    {
+      "id": "docs/guides/scratch-org-settings.md#chunk-7",
+      "hash": "47a438a3543d452bad6c4a9f0c541c26bea3b3eaf3bc6ddd564c5a372ffb8be1"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-0",
+      "hash": "13bd564fe4885961298e33bbe558f27936d8420e093ce88f826c010e57d7317e"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-1",
+      "hash": "c67ec185e9b47027d62f9d4680eae5014a53c2657da2589c21bc1064ca94c1ec"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-2",
+      "hash": "b0f317c4096c4f6eb2b03af7ff39f7c653f66a8ef7ec5520fae98c4ec8a272b6"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-3",
+      "hash": "a7b37ac3f12283f447ea3c75fff4e9bff6ae665f6094b5edfbf4f5e1da5c5080"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-4",
+      "hash": "c766e90c7f3a1520fce2a9e320122215c0fb1a4992d8807537f6c672bdf6342c"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-5",
+      "hash": "74ec5d5d07f7e5b15d169ba4de8b3757814ff68ac43727fdea6831ea94656589"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-6",
+      "hash": "dcbecd0e567241c5548235293213610bb907579a477e90f502a97801bc6d826f"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-7",
+      "hash": "b1b87af3ed0a6b29e3ea4f358c02f2d1bc4e0ee3f1edc982d10bf4f36042bbff"
+    },
+    {
+      "id": "docs/reference/cli.md#chunk-8",
+      "hash": "1cf7db465e834f4c60ad234d59bba4236b5c2a8bafb73df5785d96411cbaad15"
+    },
+    {
+      "id": "docs/reference/config.md#chunk-0",
+      "hash": "cd8ca960b1a37376239cdc204ba21996dd4e137c422c7beaa4cc99838b1ba434"
+    },
+    {
+      "id": "docs/reference/config.md#chunk-1",
+      "hash": "2449b12ad730f5ff4ab7b92c0b7fe0c0b75ae4dda3f75f8868b917fff20bde26"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-0",
+      "hash": "4cef7c9ccaaa824677620ba329ab9f12c76575e813294754f40c3ec1dc138f63"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-1",
+      "hash": "e46c0047f046a206fc04c63aecd2f0b100c41084611579ac7969616e56066175"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-2",
+      "hash": "c578c5f29b681cab7f1af8acc19361473acd8f70ba1b75f35cfb1ab795d46e30"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-3",
+      "hash": "5084300dfa3474f4e2d96886df9e5b818e1d290c63baec0f5b058acc60063162"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-4",
+      "hash": "6dc178ec4ba6744a30f93de2ff479366d5b813dbab7e644c1169da6436dfccc3"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-5",
+      "hash": "1b6e9887329819a13405987a845f8ffafd3f2996461dc245e82d464621af131b"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-6",
+      "hash": "558249412d814f8208760196e751ee0cc66388483402c6916ebe46561bbefbbd"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-7",
+      "hash": "411c229a0211cfb0449577cf6562848001c8682757ad9237792015182a920039"
+    },
+    {
+      "id": "docs/reference/exec-provider.md#chunk-8",
+      "hash": "3bc0e610482b99d774d7e2b7ffe15ee90f8acbd0fe8570f5d7defcc633372799"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-0",
+      "hash": "4e1dc0135b969bea30105feaa3ad547ccc9b9e9e84b5ec084045070f94b5de00"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-1",
+      "hash": "a4701ac5423ccfa79a7761d76eb634acf5b8bd59bebe90762f8ff1f2300d18d7"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-2",
+      "hash": "be305a3d999c3e1efb1f4440b28f3a1029aef5459a937c10c7b833baef311a51"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-3",
+      "hash": "e1416f78d5ea7a0ad99134a76f1667bc1bf23485377b29db20551a6fea427c69"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-4",
+      "hash": "1df25b72e2e022a6d0f9f8c1731b5fb2468d895e48245cc257caa3efdf2ebb21"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-5",
+      "hash": "423cbdf522eff5935a01c2c5fb9364bc8e585bf1b4d647fbeef474d8a01119c7"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-6",
+      "hash": "1c4470e69e47a38bdaa9267798bb30d52dd9cc54df07df5ac5a1f441515f1b30"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-7",
+      "hash": "6a0e26c380aa4e86408c57926e3a41f9fe121bbf799cf97716fd47964bc441e1"
+    },
+    {
+      "id": "docs/reference/permit-and-rules.md#chunk-8",
+      "hash": "480d9cd78468352035fd17947ce48e75b1ef4927efa20e48d1cce5346481fdf3"
+    },
+    {
+      "id": "docs/reference/platform-reference.md#chunk-0",
+      "hash": "140776602e8fb882b34477ff05cc84b420ab7a322f4af5b192d74239c120c79a"
+    },
+    {
+      "id": "docs/reference/pr-comment-and-telemetry.md#chunk-0",
+      "hash": "1ac9114e097979453d790add279c9505f3cd1a4b41b0c8e8f4be43e979149fd0"
+    },
+    {
+      "id": "docs/reference/pr-comment-and-telemetry.md#chunk-1",
+      "hash": "e63dc37ce396fe4fa4cb96bdb935318b86e1714c73df352b92b3909b7c63a3ef"
+    },
+    {
+      "id": "docs/reference/pr-comment-and-telemetry.md#chunk-2",
+      "hash": "8002cc50ca91fd35e5478b361526419b2ff802edab8c17895166454fa3c3c2de"
+    },
+    {
+      "id": "docs/reference/rego-rules.md#chunk-0",
+      "hash": "7b3c41f4693a9d151d100e2e367866a4e54872ec6423a526673bafb08d82a841"
+    },
+    {
+      "id": "docs/reference/rego-rules.md#chunk-1",
+      "hash": "79d6400df3d2bfb6a09e055bdf6f0d4e45dad4e6aff4b37451c39c33533c2c20"
+    },
+    {
+      "id": "docs/reference/rego-rules.md#chunk-2",
+      "hash": "efe21da9dfb9d7cd6ed61751770502ee676358f233ade0689b03ee8cecb0587b"
+    },
+    {
+      "id": "docs/reference/rego-rules.md#chunk-3",
+      "hash": "a146416112750ae796e52ff982a899e9bcc162d5537e40edda7ec1f8a9c89cbe"
+    },
+    {
+      "id": "docs/reference/rego-rules.md#chunk-4",
+      "hash": "5de0cedcaf599777cdd71744e7133ce37d650e31a2cb858dc68a96b3b3a10d8e"
+    },
+    {
+      "id": "docs/reference/rego-rules.md#chunk-5",
+      "hash": "05aabc93d48803666ce8997ba9652b1380c720c564cedb5eac040e31bd2610e3"
+    },
+    {
+      "id": "docs/reference/rego-rules.md#chunk-6",
+      "hash": "a35ff654664356b2cfbac8db47b7f143afc0a5569f442a0f2b8349f8cba5affd"
+    },
+    {
+      "id": "docs/reference/releases-and-licenses.md#chunk-0",
+      "hash": "2b857f734dbd3d56929bd65bd7df7f45956eab739353a00c5c91ed9323bf6f6e"
+    },
+    {
+      "id": "docs/reference/releases-and-licenses.md#chunk-1",
+      "hash": "e04e514744a191a9a6f64eb0167b203ad7f8682ff65ad6a95cd64968dcd857f7"
+    },
+    {
+      "id": "docs/reference/releases-and-licenses.md#chunk-2",
+      "hash": "6427c9a579a597c450cb907caa39a9e17dabf0607ea4d34e4d34a94049d402f1"
+    },
+    {
+      "id": "docs/reference/releases-and-licenses.md#chunk-3",
+      "hash": "8e9d56a47513c5091298f8dfea74ab9b4eb070564b8d258ca03ed96a0e242f1d"
+    },
+    {
+      "id": "docs/reference/releases-and-licenses.md#chunk-4",
+      "hash": "168a275aa06413c20c4e157c936bf6e821892aa0d842fd18bfbd60d03435ee18"
+    },
+    {
+      "id": "docs/reference/releases-and-licenses.md#chunk-5",
+      "hash": "75d393d50714d491db0df95c120d11376bd47cbf62b0a73d6097d22b9f2e8a93"
+    },
+    {
+      "id": "docs/reference/sigstore-signing.md#chunk-0",
+      "hash": "d1c8606b15b675c7ce7d48d61a891497584881eefba1c92c88dbb24e125fda50"
+    },
+    {
+      "id": "docs/reference/sigstore-signing.md#chunk-1",
+      "hash": "479e91f60d75f58b31a13855779f6b07082c0439872e6f359940bb34cbb96a2a"
+    },
+    {
+      "id": "docs/reference/sigstore-signing.md#chunk-2",
+      "hash": "5dedbbf34e4b3b73c1eb4e82df8288070ccf297194ce1f9e53a559e7ca440e8d"
+    },
+    {
+      "id": "docs/reference/sigstore-signing.md#chunk-3",
+      "hash": "8d52a8df8e26bcdc5d40cd1e3c561ce9d58979427919ad17ebe77ad57da3404b"
+    },
+    {
+      "id": "docs/reference/sigstore-signing.md#chunk-4",
+      "hash": "2b83e32d1d4d82e092f293290664adeb5102be56cb65ada538ea027e0b946978"
+    },
+    {
+      "id": "docs/reference/sigstore-signing.md#chunk-5",
+      "hash": "9bc76a1db5be5b500d30c9accee132038219f3381dd728f41136586bd2fcb92e"
+    },
+    {
+      "id": "docs/reference/sigstore-signing.md#chunk-6",
+      "hash": "33896a97717c1fd3e61eaceabca38d85cc2726fbdeb3c342ef6c8282cf303182"
+    },
+    {
+      "id": "docs/reference/verify-and-coverage-settings.md#chunk-0",
+      "hash": "f2489c3a2df222559b2f763d9e0e946726a56fec0a922e4a7b214a97e2ae45e5"
+    },
+    {
+      "id": "docs/reference/verify-and-coverage-settings.md#chunk-1",
+      "hash": "57b3674f47a21f378ce25ae327421c545cd3abc7a614c6b934938b8b786fa302"
+    },
+    {
+      "id": "docs/reference/verify-and-coverage-settings.md#chunk-2",
+      "hash": "31c4fa2af704037c0578958e0acb9e4933907cf94c61b0478ca9e6b8f8a52ea0"
+    },
+    {
+      "id": "docs/reference/verify-and-coverage-settings.md#chunk-3",
+      "hash": "8071da46c3bec2739f48c0c17e923a3456848c9d1d4f68d085a088312ec79d22"
+    },
+    {
+      "id": "docs/vision.md#chunk-0",
+      "hash": "da84bce7f1bb990b680034ddbd1b2e19eb27787606bdb572a4e43aa782c22edf"
+    },
+    {
+      "id": "docs/vision.md#chunk-1",
+      "hash": "a6393eaa6d719140c6802c0d9ae69e6fff5c53631a60c24b7474b6a519d449b4"
+    },
+    {
+      "id": "docs/vision.md#chunk-2",
+      "hash": "938fa1d56ed5a846acb4a39797d8345751f5d9dffff1da12576c154bccfa1dbd"
+    },
+    {
+      "id": "docs/vision.md#chunk-3",
+      "hash": "1258c16dd3599ad5f8c745950ecf1b5582f8ede77404397fa80ee88b91ce17d0"
+    },
+    {
+      "id": "docs/vision.md#chunk-4",
+      "hash": "309acb76c19f698e3f3f82fc373682cdc006ab7be1cf607d343b17f558bacca2"
+    },
+    {
+      "id": "docs/vision.md#chunk-5",
+      "hash": "5bff77011e9a02d6a52369f96a307fb1f80eac87ea9365f48cae5e1e10293bab"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-0",
+      "hash": "713b5b9c688af67076ab41e18f2b332a0d1e1511021d9380d5a359a90ec977fa"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-1",
+      "hash": "4c349e16dca423686c3d96a900d08fa72427876e97df7e895c090abb0a279662"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-10",
+      "hash": "b897d5a23db28600d5fd1145808b0ee34158a783cd0b4db0742aa08a4537d2ad"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-11",
+      "hash": "1fe1fa403a16769247893171fc77dc5ab146f917e93aaed555e19d4804e08d4d"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-12",
+      "hash": "1f9bbadad756f8d43d6f99463b7c845d5012ae0c9296a0ccb5d568f7af1be960"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-2",
+      "hash": "6eef71ef71a4b320ef80973746190b81d43379b028fcbae0dd2962952e6d92e6"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-3",
+      "hash": "67071c911b0790912d8fdfd0ef1365cb61a702b9dfa7b46b1f30ad2620f646b6"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-4",
+      "hash": "301a2b6aab4bfccd9a4f130c857c6779cc0bdcfa73ead9683723dd32849d611a"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-5",
+      "hash": "2e227c96c25a69d6e3c6e07043a505801b9afdff0b5a3d65c5779f2ef53835ea"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-6",
+      "hash": "60234b8ce03a23e2a10c026ed72914568db5eda2717831bf475d18caba3b2b87"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-7",
+      "hash": "26f9f2b9c8ab1749541cc9e42d66a66b86b3f8577e9692a2a6654c0ff59a170b"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-8",
+      "hash": "374475e38a660bd3fffd848526d276a15fc3abbf1bf2eef4341a1a834da5dccd"
+    },
+    {
+      "id": "docs/whitepaper.md#chunk-9",
+      "hash": "1ccd21722839c6b25b85a5628d8c97d15ee0152396a55ea6f4d0b65ee95dcedc"
+    }
+  ],
+  "source_commit": "0dc43a15e72c5a20a42b8aaf2265136b4f79a0a9"
+}

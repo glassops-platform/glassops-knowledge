@@ -1,79 +1,99 @@
+# embeddings/gemini_embedding.py
+"""
+Embeddings through the Google Gen AI SDK (google-genai).
+
+The model id and output size come from config. Any failure raises EmbeddingError. There is no
+fallback vector: a failed embedding stops the run instead of writing noise into the index.
+"""
+
 import os
 import time
-import warnings
+from typing import Callable, List, Optional
 
-# Suppress google.generativeai deprecation warning
-warnings.filterwarnings("ignore", category=FutureWarning, module="google.generativeai")
-warnings.filterwarnings("ignore", category=FutureWarning, module="google.auth")
+from knowledge.settings import EmbeddingSettings
+from knowledge.utils.rate_limit import RateLimiter, estimate_tokens
+from knowledge.utils.retry import is_retryable
 
-try:
-    import google.generativeai as genai
-except ImportError:
-    genai = None
+TASK_DOCUMENT = "RETRIEVAL_DOCUMENT"
+TASK_QUERY = "RETRIEVAL_QUERY"
+
+
+class EmbeddingError(Exception):
+    """An embedding could not be produced. The caller must stop, not substitute a vector."""
+
+
+def _api_key() -> str:
+    return os.getenv("GOOGLE_API_KEY", "").strip().strip("'\"")
+
 
 class GeminiEmbedding:
-    def __init__(self):
-        self.api_key = os.getenv("GOOGLE_API_KEY")
-        if not self.api_key:
-             print("[WARNING] Warning: GOOGLE_API_KEY not set. GeminiEmbedding will return mock data.")
-        elif genai:
-            genai.configure(api_key=self.api_key)
+    def __init__(
+        self,
+        settings: EmbeddingSettings,
+        client=None,
+        max_retries: int = 4,
+        backoffs: Optional[List[float]] = None,
+        sleep: Callable[[float], None] = time.sleep,
+        limiter: Optional[RateLimiter] = None,
+    ):
+        self.settings = settings
+        self.max_retries = max_retries
+        self.backoffs = backoffs if backoffs is not None else [15, 30, 60, 120]
+        self._sleep = sleep
+        self.limiter = limiter or RateLimiter(settings.rpm_limit, settings.tpm_limit, sleep=sleep)
+        if client is None:
+            key = _api_key()
+            if not key:
+                raise EmbeddingError("GOOGLE_API_KEY is not set, so no embeddings can be made")
+            from google import genai
 
-    def get_embeddings(self, texts: list[str]) -> list[list[float]]:
-        if self.api_key and genai:
+            client = genai.Client(api_key=key)
+        self.client = client
+
+    def get_embeddings(self, texts: List[str], task_type: str = TASK_DOCUMENT) -> List[List[float]]:
+        """Embed a batch of texts. Returns one vector per text, each of the configured size."""
+        if not texts:
+            return []
+        from google.genai import types
+
+        config = types.EmbedContentConfig(
+            task_type=task_type,
+            output_dimensionality=self.settings.dimensions,
+        )
+        self.limiter.acquire(sum(estimate_tokens(t) for t in texts))
+
+        last_error: Optional[Exception] = None
+        for attempt in range(self.max_retries + 1):
             try:
-                # Try batched call first
-                model = "models/text-embedding-004" 
-                
-                # Check for list support in embed_content (older SDK behavior)
-                # or use batch_embed_contents if available (newer SDK)
-                # Ideally, we just try to pass the list.
-                
-                result = genai.embed_content(
-                    model=model,
-                    content=texts,
-                    task_type="retrieval_document"
+                response = self.client.models.embed_content(
+                    model=self.settings.model,
+                    contents=texts,
+                    config=config,
                 )
-                
-                # If result contains 'embedding', it might be a single embedding (if texts was string)
-                # OR a list of embeddings? 
-                # According to docs, passing a list of strings returns a dict with 'embedding' key which is a list of lists.
-                if 'embedding' in result:
-                    emb_data = result['embedding']
-                    # Verify structure
-                    if isinstance(emb_data, list) and len(emb_data) > 0:
-                        # If list of lists (batch)
-                        if isinstance(emb_data[0], list):
-                             return emb_data
-                        # If list of floats (single), but we passed a list?
-                        # This happens if 'texts' was a single string, but type hint says list[str].
-                        # If we passed list of 1 string, it usually returns list of 1 vector.
-                        # Let's handle generic case:
-                        return [emb_data] if isinstance(emb_data[0], (float, int)) else emb_data
+                break
+            except Exception as e:  # the SDK raises several types, all handled the same way
+                last_error = e
+                if is_retryable(e) and attempt < self.max_retries:
+                    wait = self.backoffs[min(attempt, len(self.backoffs) - 1)]
+                    print(f"[WARNING] Embedding request failed ({str(e)[:60]}). Retrying in {wait}s...")
+                    self._sleep(wait)
+                    continue
+                raise EmbeddingError(f"embedding request to {self.settings.model} failed: {e}") from e
+        else:  # pragma: no cover - the loop always breaks or raises
+            raise EmbeddingError(f"embedding request failed: {last_error}")
 
-            except Exception as e:
-                # Pass through to fallback
-                # print(f"DEBUG: Batch embedding failed ({e}), switching to sequential.")
-                pass
-
-        # Fallback: Sequential processing
-        if self.api_key and genai:
-             embeddings = []
-             for text in texts:
-                 try:
-                     result = genai.embed_content(
-                        model="models/text-embedding-004",
-                        content=text,
-                        task_type="retrieval_document"
-                     )
-                     embeddings.append(result['embedding'])
-                 except Exception as e:
-                     print(f"[ERROR] Error embedding chunk: {e}")
-                     # Random fallback for failed chunk to keep alignment
-                     import random
-                     embeddings.append([random.random() for _ in range(768)])
-             return embeddings
-
-        # Mock 768-dim vectors
-        import random
-        return [[random.random() for _ in range(768)] for _ in texts]
+        embeddings = getattr(response, "embeddings", None) or []
+        if len(embeddings) != len(texts):
+            raise EmbeddingError(
+                f"{self.settings.model} returned {len(embeddings)} embeddings for {len(texts)} inputs"
+            )
+        vectors = []
+        for i, emb in enumerate(embeddings):
+            values = list(getattr(emb, "values", None) or [])
+            if len(values) != self.settings.dimensions:
+                raise EmbeddingError(
+                    f"embedding {i} from {self.settings.model} has {len(values)} dimensions, "
+                    f"config expects {self.settings.dimensions}"
+                )
+            vectors.append([float(v) for v in values])
+        return vectors
