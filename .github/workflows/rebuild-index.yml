@@ -11,8 +11,6 @@ on:
       ref:
         description: glassops commit or branch to index
         default: main
-  push:
-    branches: [knowledge/b005-fixes]
 
 permissions:
   contents: read
