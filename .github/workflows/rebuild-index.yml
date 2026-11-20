@@ -55,7 +55,9 @@ jobs:
           from google import genai
           cfg = json.load(open("config/config.json", encoding="utf-8"))["models"]
           want = {cfg["embedding"]["id"], cfg["generation"]["docs"], cfg["generation"]["query"]}
-          have = {m.name.removeprefix("models/") for m in genai.Client().models.list()}
+          # Keep the client in a name. A client built inline is closed before the list call runs.
+          client = genai.Client()
+          have = {m.name.removeprefix("models/") for m in client.models.list()}
           missing = sorted(w for w in want if w not in have)
           print("configured:", sorted(want))
           if missing:
